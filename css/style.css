@@ -158,3 +158,26 @@ html, body {
 	bottom: 0;
 	padding: 14px;
 }
+
+@media only screen and (max-width: 600px) {
+	.settings {
+		padding: 0;
+	}
+
+	.settings-title {
+		text-align: center;
+	}
+
+	.settings label {
+		display: block;
+		width: auto;
+		text-align: center;
+	}
+
+	.settings input,
+	.settings button,
+	.settings label {
+		display: block;
+		margin: 5px auto;
+	}
+}

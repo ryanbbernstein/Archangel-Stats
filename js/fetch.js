@@ -8,6 +8,7 @@ let sentNotification = false;
 function statisticError(xhr, status, type) {
 	let $error = $("#js-request-error");
 	let $number = $("#js-number-playing");
+	let $title = $("title");
 
 	switch(status) {
 		case "parsererror":
@@ -21,6 +22,7 @@ function statisticError(xhr, status, type) {
 	}
 
 	console.error(`Status: '${status}' Error: '${type}'`);
+	$title.text("(?) Archangel VR: Matchmaking");
 	$number.text("Unknown");
 	$error.show();
 }
@@ -29,6 +31,7 @@ function statisticSuccess(json) {
 	let $number = $("#js-number-playing");
 	let $information = $("#js-statistics-content");
 	let $time = $("#js-last-updated-time");
+	let $title = $("title");
 	$information.empty();
 
 	if (!("total" in json) || !("averageWaitTime" in json) || !("lastStatisticsTime" in json)) {
@@ -60,7 +63,7 @@ function statisticSuccess(json) {
 	}
 
 	if (!sentNotification && json.total >= notifMin) {
-		spawnNotification(
+		notificationSpawn(
 			"There are " + json.total + " players matchmaking right now!",
 			"img/icon.jpg",
 			"Player Alert"
@@ -74,30 +77,55 @@ function statisticSuccess(json) {
 
 	let date = new Date(json.lastStatisticsTime);
 	let time =  "Wait Time: ~" + Math.ceil(json.averageWaitTime/1000) + " s";
+
 	$information.append($("<span></span>").text(time));
 	$number.text(json.total);
 	$time.text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
+	$title.text("(" + json.total + ") Archangel VR: Matchmaking");
 }
 
 function notificationText($elem, status) {
 	if (status === "yes") {
 		$elem.text("Disable Notifications");
+		$elem.removeAttr("disabled");
 	} else if(status === "no") {
 		$elem.text("Enable Notifications");
+		$elem.removeAttr("disabled");
 	} else if(status === "denied") {
 		$elem.text("Notifications Blocked");
+		$elem.attr("disabled", "disabled");
 	} else if(status === "pending") {
 		$elem.text("Permission Pending...");
+		$elem.attr("disabled", "disabled");
 	}
 }
 
-function spawnNotification(body, icon, title) {
+function notificationSpawn(body, icon, title) {
 	if (notifEnabled) {
 		new Notification(title, {
 			body: body,
 			icon: icon
 		});
 	}
+}
+
+function notificationRequest($elem, result) {
+	if (result === "granted") {
+		notifEnabled = "yes";
+		notificationSpawn(
+			"You have chosen to enable notifications. We'll let you know when there is "
+			+ notifMin + " or more players in the matchmaking queue.",
+			"img/icon.jpg",
+			"Notifications"
+		);
+
+		notificationText($elem, notifEnabled);
+	} else {
+		notifEnabled = "no";
+		notificationText($elem, "denied");
+	}
+
+	localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled);
 }
 
 function setup() {
@@ -148,22 +176,7 @@ function setup() {
 		} else if (notifEnabled === "no") {
 			notificationText($notifEnabled, "pending");
 			Notification.requestPermission().then(function(result) {
-				if (result === "granted") {
-					notifEnabled = "yes";
-					spawnNotification(
-						"You have chosen to enable notifications. We'll let you know when there is "
-						+ notifMin + " or more players matchmaking.",
-						"img/icon.jpg",
-						"Notifications"
-					);
-
-					notificationText($notifEnabled, notifEnabled);
-				} else {
-					notifEnabled = "no";
-					notificationText($notifEnabled, "denied");
-				}
-
-				localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled);
+				notificationRequest($notifEnabled, result);
 			});
 		}
 

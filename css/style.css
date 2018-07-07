@@ -149,3 +149,12 @@ html, body {
 	margin: 4px 0;
 	padding-left: 16px;
 }
+
+.time {
+	color: #bbb;
+	text-shadow: 2px 2px 3px black;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	padding: 14px;
+}

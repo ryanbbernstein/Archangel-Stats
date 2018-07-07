@@ -28,10 +28,11 @@ function statisticError(xhr, status, type) {
 function statisticSuccess(json) {
 	let $number = $("#js-number-playing");
 	let $information = $("#js-statistics-content");
+	let $time = $("#js-last-updated-time");
 	$information.empty();
 
-	if (!("total" in json) || !("averageWaitTime" in json)) {
-		statisticError(null, "parsererror", "Response did not contain key 'total' or 'averageWaitTime'!");
+	if (!("total" in json) || !("averageWaitTime" in json) || !("lastStatisticsTime" in json)) {
+		statisticError(null, "parsererror", "Response did not contain key 'total', 'averageWaitTime', or 'lastStatisticsTime'!");
 		return;
 	}
 
@@ -71,9 +72,11 @@ function statisticSuccess(json) {
 		sentNotification = false;
 	}
 
+	let date = new Date(json.lastStatisticsTime);
 	let time =  "Wait Time: ~" + Math.ceil(json.averageWaitTime/1000) + " s";
 	$information.append($("<span></span>").text(time));
 	$number.text(json.total);
+	$time.text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
 }
 
 function notificationText($elem, status) {

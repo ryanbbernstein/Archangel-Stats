@@ -1,29 +1,34 @@
-function ucfirst(str) {
-	return str.charAt(0).toUpperCase() + str.slice(1);
-}
+const NOTIFICATION_ENABLED = "notifications-enabled";
+const NOTIFICATION_MIN = "notifications-min";
+
+let notifEnabled;
+let notifMin;
+let sentNotification = false;
 
 function statisticError(xhr, status, type) {
-	let error = $("#js-request-error");
-	let number = $("#js-number-playing");
+	let $error = $("#js-request-error");
+	let $number = $("#js-number-playing");
+
 	switch(status) {
 		case "parsererror":
-			error.text("Malformed matchmaking data!");
+			$error.text("Malformed matchmaking data!");
 			break;
 		case "error":
-			error.text(type === "" ? "Unknown HTTP Error" : "HTTP Error: " + ucfirst(type));
+			$error.text(type === "" ? "Unknown HTTP Error" : "HTTP Error: " + type);
 			break;
 		default:
-			error.text("Unknown error, see console.")
+			$error.text("Unknown error, see console.")
 	}
-	number.text("Unknown");
+
 	console.error(`Status: '${status}' Error: '${type}'`);
-	error.show();
+	$number.text("Unknown");
+	$error.show();
 }
 
 function statisticSuccess(json) {
-	let number = $("#js-number-playing");
-	let information = $("#js-statistics-content");
-	information.empty();
+	let $number = $("#js-number-playing");
+	let $information = $("#js-statistics-content");
+	$information.empty();
 
 	if (!("total" in json) || !("averageWaitTime" in json)) {
 		statisticError(null, "parsererror", "Response did not contain key 'total' or 'averageWaitTime'!");
@@ -44,29 +49,123 @@ function statisticSuccess(json) {
 	}
 
 	if (regions.length > 0) {
-		information.append("<span>Region (Players):</span>");
+		$information.append("<span>Region (Players):</span>");
 		let list = $("<ul class='information-list'></ul>");
 		regions.forEach(function (region) {
 			let formatted = region.region + " (" + region.players + ")";
 			list.append($("<li></li>").text(formatted));
 		});
-		information.append(list);
+		$information.append(list);
+	}
+
+	if (!sentNotification && json.total >= notifMin) {
+		spawnNotification(
+			"There are " + json.total + " players matchmaking right now!",
+			"img/icon.jpg",
+			"Player Alert"
+		);
+		sentNotification = true;
+	}
+
+	if (sentNotification && json.total < notifMin) {
+		sentNotification = false;
 	}
 
 	let time =  "Wait Time: ~" + Math.ceil(json.averageWaitTime/1000) + " s";
-	information.append($("<span></span>").text(time));
-	number.text(json.total);
+	$information.append($("<span></span>").text(time));
+	$number.text(json.total);
+}
+
+function notificationText($elem, status) {
+	if (status === "yes") {
+		$elem.text("Disable Notifications");
+	} else if(status === "no") {
+		$elem.text("Enable Notifications");
+	} else if(status === "denied") {
+		$elem.text("Notifications Blocked");
+	} else if(status === "pending") {
+		$elem.text("Permission Pending...");
+	}
+}
+
+function spawnNotification(body, icon, title) {
+	if (notifEnabled) {
+		new Notification(title, {
+			body: body,
+			icon: icon
+		});
+	}
 }
 
 function setup() {
-	$("#js-statistics-toggle").click(function() {
+	//grab all settings from local storage
+	notifEnabled = localStorage.getItem(NOTIFICATION_ENABLED);
+	notifMin = localStorage.getItem(NOTIFICATION_MIN);
+
+	//cache all jquery objects
+	let $notifEnabled = $("#js-notification-toggle");
+	let $notifMin = $("#js-notification-minimum");
+	let $stats = $("#js-statistics-toggle");
+	let $settings = $("#js-settings-toggle");
+
+	//default values
+	if (notifMin === null) {
+		notifMin = "1";
+		localStorage.setItem(NOTIFICATION_MIN, notifMin);
+	}
+
+	if (notifEnabled === null) {
+		notifEnabled = "no";
+		localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled.toString());
+	}
+
+	//set jquery object values
+	$notifMin.val(notifMin);
+	notificationText($notifEnabled, notifEnabled);
+
+	//tie events to jquery objects
+	$stats.click(function() {
 		let information = $("#js-statistics-content");
 		information.toggle();
 	});
 
-	$("#js-settings-toggle").click(function() {
+	$settings.click(function() {
 		let settings = $("#js-settings-content");
 		settings.toggle();
+	});
+
+	$notifMin.change(function () {
+		notifMin = $notifMin.val();
+		localStorage.setItem(NOTIFICATION_MIN, notifMin);
+	});
+
+	$notifEnabled.click(function () {
+		if (notifEnabled === "yes") {
+			notifEnabled = "no";
+		} else if (notifEnabled === "no") {
+			notificationText($notifEnabled, "pending");
+			Notification.requestPermission().then(function(result) {
+				if (result === "granted") {
+					notifEnabled = "yes";
+					spawnNotification(
+						"You have chosen to enable notifications. We'll let you know when there is "
+						+ notifMin + " or more players matchmaking.",
+						"img/icon.jpg",
+						"Notifications"
+					);
+
+					notificationText($notifEnabled, notifEnabled);
+				} else {
+					notifEnabled = "no";
+					notificationText($notifEnabled, "denied");
+				}
+
+				localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled);
+			});
+		}
+
+		localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled);
+		notificationText($notifEnabled, notifEnabled);
 	})
 }
 

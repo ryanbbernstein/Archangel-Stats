@@ -22,13 +22,47 @@ function statisticError(xhr, status, type) {
 
 function statisticSuccess(json) {
 	let number = $("#js-number-playing");
-	
-	if (!("total" in json)) {
-		statisticError(null, "parsererror", "Response did not contain key 'total'!");
+	let information = $("#js-statistics-content");
+	information.empty();
+
+	if (!("total" in json) || !("averageWaitTime" in json)) {
+		statisticError(null, "parsererror", "Response did not contain key 'total' or 'averageWaitTime'!");
 		return;
 	}
 
+	let regions = [];
+	if ("regions" in json) {
+		let reg = json.regions;
+		for (let key in reg) {
+			if (reg.hasOwnProperty(key)) {
+				regions.push({
+					"region": key,
+					"players": reg[key]
+				})
+			}
+		}
+	}
+
+	if (regions.length > 0) {
+		information.append("<span>Region (Players):</span>");
+		let list = $("<ul class='information-list'></ul>");
+		regions.forEach(function (region) {
+			let formatted = region.region + " (" + region.players + ")";
+			list.append($("<li></li>").text(formatted));
+		});
+		information.append(list);
+	}
+
+	let time =  "Wait Time: ~" + Math.ceil(json.averageWaitTime/1000) + " s";
+	information.append($("<span></span>").text(time));
 	number.text(json.total);
+}
+
+function setup() {
+	$("#js-statistics-tab").click(function() {
+		let information = $("#js-statistics-content");
+		information.toggle();
+	});
 }
 
 function update() {
@@ -43,6 +77,7 @@ function update() {
 }
 
 $(function() {
-	setInterval(update, 10000);
+	setup();
 	update();
+	setInterval(update, 10000);
 });

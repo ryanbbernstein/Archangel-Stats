@@ -59,10 +59,15 @@ function statisticSuccess(json) {
 }
 
 function setup() {
-	$("#js-statistics-tab").click(function() {
+	$("#js-statistics-toggle").click(function() {
 		let information = $("#js-statistics-content");
 		information.toggle();
 	});
+
+	$("#js-settings-toggle").click(function() {
+		let settings = $("#js-settings-content");
+		settings.toggle();
+	})
 }
 
 function update() {

@@ -40,6 +40,37 @@ html, body {
 	transform: rotate(90deg);
 }
 
+.settings {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	background: linear-gradient(
+		0,
+		rgba(0,0,0,0),
+		rgba(0,0,0,.8) 20%,
+		rgba(0,0,0,.8) 100%
+	);
+	padding: 10px 80px 60px;
+}
+
+.settings-title {
+	font-size: 40px;
+	font-weight: 600;
+}
+
+.settings label {
+	display: inline-block;
+	width: 150px;
+	text-align: right;
+}
+
+.settings input,
+.settings button,
+.settings label {
+	margin: 5px;
+}
+
 .flash {
 	display: block;
 	padding: 5px 40px;

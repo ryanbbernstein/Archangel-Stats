@@ -12,7 +12,16 @@
 	<script src="js/fetch.js"></script>
 </head>
 <body>
-<div class="gear">
+<div id="js-settings-content" class="settings" style="display: none">
+	<div class="settings-title">Settings:</div>
+	<label for="js-notification-toggle" title="Press here if you would like notifications sent to you when people start searching">Notifications:</label>
+	<button id='js-notification-toggle'>Enable Notifications</button><br>
+	<label for="js-notification-minimum" title="Don't send a notification unless this many players are searching">Minimum Players:</label>
+	<input  id="js-notification-minimum" type="number"  value="1" min="1" step="1"><br>
+	<label for="js-settings-save">Save</label>
+	<button id="js-settings-save">Save</button>
+</div>
+<div id="js-settings-toggle" class="gear">
 	<img class="gear-image" src="img/gear.svg" alt="Settings" title="Configure Options">
 </div>
 <div id="background">
@@ -37,7 +46,7 @@
 			<!-- JS -->
 			Loading...
 		</div>
-		<div id="js-statistics-tab" class="information-tab">
+		<div id="js-statistics-toggle" class="information-tab">
 			Statistics
 		</div>
 	</div>

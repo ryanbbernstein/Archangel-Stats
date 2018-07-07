@@ -32,8 +32,8 @@ function statisticSuccess(json) {
 	let $information = $("#js-statistics-content");
 	let $time = $("#js-last-updated-time");
 	let $title = $("title");
-	$information.empty();
 
+	$information.empty();
 	if (!("total" in json) || !("averageWaitTime" in json) || !("lastStatisticsTime" in json)) {
 		statisticError(null, "parsererror", "Response did not contain key 'total', 'averageWaitTime', or 'lastStatisticsTime'!");
 		return;
@@ -85,18 +85,26 @@ function statisticSuccess(json) {
 }
 
 function notificationText($elem, status) {
-	if (status === "yes") {
-		$elem.text("Disable Notifications");
-		$elem.removeAttr("disabled");
-	} else if(status === "no") {
-		$elem.text("Enable Notifications");
-		$elem.removeAttr("disabled");
-	} else if(status === "denied") {
-		$elem.text("Notifications Blocked");
-		$elem.attr("disabled", "disabled");
-	} else if(status === "pending") {
-		$elem.text("Permission Pending...");
-		$elem.attr("disabled", "disabled");
+	switch (status) {
+		case "yes":
+			$elem.text("Disable Notifications");
+			$elem.removeAttr("disabled");
+			break;
+		case "no":
+			$elem.text("Enable Notifications");
+			$elem.removeAttr("disabled");
+			break;
+		case "denied":
+			$elem.text("Notifications Blocked");
+			$elem.attr("disabled", "disabled");
+			break;
+		case "pending":
+			$elem.text("Permission Pending...");
+			$elem.attr("disabled", "disabled");
+			break;
+		default:
+			$elem.text("Notification Error...");
+			$elem.attr("disabled", "disabled");
 	}
 }
 
@@ -112,14 +120,13 @@ function notificationSpawn(body, icon, title) {
 function notificationRequest($elem, result) {
 	if (result === "granted") {
 		notifEnabled = "yes";
+		notificationText($elem, notifEnabled);
 		notificationSpawn(
 			"You have chosen to enable notifications. We'll let you know when there is "
 			+ notifMin + " or more players in the matchmaking queue.",
 			"img/icon.jpg",
 			"Notifications"
 		);
-
-		notificationText($elem, notifEnabled);
 	} else {
 		notifEnabled = "no";
 		notificationText($elem, "denied");
@@ -147,7 +154,7 @@ function setup() {
 
 	if (notifEnabled === null) {
 		notifEnabled = "no";
-		localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled.toString());
+		localStorage.setItem(NOTIFICATION_ENABLED, notifEnabled);
 	}
 
 	//set jquery object values
@@ -156,13 +163,11 @@ function setup() {
 
 	//tie events to jquery objects
 	$stats.click(function() {
-		let information = $("#js-statistics-content");
-		information.toggle();
+		$("#js-statistics-content").toggle();
 	});
 
 	$settings.click(function() {
-		let settings = $("#js-settings-content");
-		settings.toggle();
+		$("#js-settings-content").toggle();
 	});
 
 	$notifMin.change(function () {

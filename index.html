@@ -11,17 +11,28 @@
 	<script src="js/fetch.js"></script>
 </head>
 <body>
-<img class="settings" src="img/gear.svg" alt="Settings" title="Configure Options">
+<div class="gear">
+	<img class="gear-image" src="img/gear.svg" alt="Settings" title="Configure Options">
+</div>
 <div id="background">
+	<div id="js-request-error" class="flash flash-error" style="display: none" title="See console for details.">
+		<!-- JS -->
+	</div>
 	<div id="searching" class="content">
 		<div class="content-stripe"></div>
-		<div class="content-title">
-			Players Searching:
-		</div>
-		<div class="content-number">
-			6
+		<div class="content-padding">
+			<div class="content-title">
+				Players Searching:
+			</div>
+			<div id="js-number-playing" class="content-number">
+				<!-- JS -->
+				Loading...
+			</div>
 		</div>
 		<div class="content-stripe"></div>
+	</div>
+	<div class="information">
+
 	</div>
 </div>
 </body>

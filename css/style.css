@@ -86,12 +86,33 @@ html, body {
 	background-color: rgba(0, 120, 0, .9);
 }
 
+.loading-outer {
+	width: 0;
+	height: 0;
+	overflow: visible;
+	display: block;
+	float: left;
+}
+
+.loading-inner {
+	border: 2px solid transparent;
+	border-top: 2px solid #fff;
+	border-bottom: 2px solid #fff;
+	border-radius: 50%;
+	width: 10px;
+	height: 10px;
+	margin: 10px;
+	animation: spin 2s linear infinite;
+	will-change: transform;
+}
+
 .content {
 	margin: 0 20px;
 	display: block;
 	width: 100%;
 	max-width: 600px;
 	background-color: rgba(0,0,0,0.7);
+	animation: pulse 10s ease infinite;
 	box-shadow: rgba(0,0,0,0.7) 4px 4px 4px;
 }
 
@@ -157,6 +178,17 @@ html, body {
 	left: 0;
 	bottom: 0;
 	padding: 14px;
+}
+
+@keyframes pulse {
+	0% {background-color: rgba(0,0,0,0.7);}
+	50% {background-color: rgba(0,0,0,0.4);}
+	100% {background-color: rgba(0,0,0,0.7);}
+}
+
+@keyframes spin {
+	0% {transform: rotate(0deg);}
+	100% {transform: rotate(360deg);}
 }
 
 @media only screen and (max-width: 600px) {

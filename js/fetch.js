@@ -30,8 +30,6 @@ function statisticError(xhr, status, type) {
 function statisticSuccess(json) {
 	let $number = $("#js-number-playing");
 	let $information = $("#js-statistics-content");
-	let $time = $("#js-last-updated-time");
-	let $title = $("title");
 
 	$information.empty();
 	if (!("total" in json) || !("averageWaitTime" in json) || !("lastStatisticsTime" in json)) {
@@ -80,8 +78,14 @@ function statisticSuccess(json) {
 
 	$information.append($("<span></span>").text(time));
 	$number.text(json.total);
-	$time.text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
-	$title.text("(" + json.total + ") Archangel VR: Matchmaking");
+	$("#js-last-updated-time").text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
+	$("title").text("(" + json.total + ") Archangel VR: Matchmaking");
+
+	//make loading symbol stick around for a little bit so the
+	//user knows the app is actually doing something
+	setTimeout(function () {
+		$(".loading-outer").hide();
+	}, 200);
 }
 
 function notificationText($elem, status) {
@@ -191,6 +195,7 @@ function setup() {
 }
 
 function update() {
+	$(".loading-outer").show();
 	$.ajax({
 		"url": "https://aa.sdawsapi.com/matchmaking/stats",
 		"dataType": "json",

@@ -78,6 +78,7 @@ function statisticSuccess(json) {
 
 	$information.append($("<span></span>").text(time));
 	$number.text(json.total);
+	$("#js-request-error").hide();
 	$("#js-last-updated-time").text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
 	$("title").text("(" + json.total + ") Archangel VR: Matchmaking");
 

@@ -114,7 +114,7 @@ function notificationText($elem, status) {
 }
 
 function notificationSpawn(body, icon, title) {
-	if (notifEnabled) {
+	if (notifEnabled === "yes") {
 		new Notification(title, {
 			body: body,
 			icon: icon

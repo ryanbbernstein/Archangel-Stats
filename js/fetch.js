@@ -27,7 +27,7 @@ function statisticError(xhr, status, type) {
 	$error.show();
 }
 
-function statisticSuccess(json) {
+function statisticSuccessMatchmaking(json) {
 	let $number = $("#js-number-playing");
 	let $information = $("#js-statistics-content");
 
@@ -82,6 +82,17 @@ function statisticSuccess(json) {
 	$("#js-last-updated-time").text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
 	$("title").text("(" + json.total + ") Archangel VR: Matchmaking");
 
+	//make loading symbol stick around for a little bit so the
+	//user knows the app is actually doing something
+	setTimeout(function () {
+		$(".loading-outer").hide();
+	}, 200);
+}
+
+function statisticSuccessPlayers(json) {
+	$("#js-number-online").text(json.total);
+	$("#js-request-error").hide();
+	$("#js-last-updated-time").text("Last Updated: " + date.toLocaleDateString() + " / " +date.toLocaleTimeString());
 	//make loading symbol stick around for a little bit so the
 	//user knows the app is actually doing something
 	setTimeout(function () {
@@ -202,7 +213,15 @@ function update() {
 		"dataType": "json",
 		"crossDomain": true,
 		"timeout": 2000,
-		"success": statisticSuccess,
+		"success": statisticSuccessMatchmaking,
+		"error": statisticError
+	})
+	$.ajax({
+		"url": "https://aa.sdawsapi.com/players/stats",
+		"dataType": "json",
+		"crossDomain": true,
+		"timeout": 2000,
+		"success": statisticSuccessPlayers,
 		"error": statisticError
 	})
 }
